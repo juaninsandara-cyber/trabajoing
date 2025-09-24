@@ -3,6 +3,10 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', (req,res)=>{ res.send("Hola clase!!")});
+<<<<<<< HEAD
+=======
+router.get('/', (req,res)=>{ res.send("Parqueadero futuro")});
+>>>>>>> 87717b0 (Proyecto Parqueadero)
 router.get('/productos', (req,res)=>{ res.send("LISTA DE PRODUCTOS")});
 
 module.exports = router;
