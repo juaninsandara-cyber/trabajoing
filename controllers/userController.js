@@ -1,12 +1,17 @@
-// controllers/userController.js
-exports.login = (req, res) => {
+const User = require('../models/user');
+
+exports.login = async (req, res) => {
   const { username, password } = req.body;
 
-  // Caso válido
-  if (username === 'testUser' && password === 'testPass') {
-    return res.status(200).json({ token: 'fake-jwt-token' });
-  }
+  try {
+    const user = await User.findOne({ where: { username, password } });
 
-  // Caso inválido
-  return res.status(401).json({ message: 'Credenciales inválidas' });
+    if (user) {
+      return res.status(200).json({ token: 'fake-jwt-token' });
+    }
+
+    return res.status(401).json({ message: 'Credenciales inválidas' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Error del servidor', error });
+  }
 };

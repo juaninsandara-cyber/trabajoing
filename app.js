@@ -16,5 +16,12 @@ app.use(cookieParser());
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+//pruebas
+const sequelize = require('./config/database');
+
+sequelize.authenticate()
+  .then(() => console.log('✅ Conexión a la base de datos exitosa'))
+  .catch(err => console.error('❌ Error de conexión a la base de datos:', err));
+
 
 module.exports = app;

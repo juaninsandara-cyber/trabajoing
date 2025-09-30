@@ -4,8 +4,13 @@ const userController = require('../controllers/userController');
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
+  res.send('SAUVE ESA PARTE');
 });
 router.post('/login', userController.login);
+
+ router.get('/login', (req, res) => {
+  res.send('Formulario de login');
+ });
+
 
 module.exports = router;
