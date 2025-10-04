@@ -8,9 +8,11 @@ router.get('/', function(req, res, next) {
 });
 router.post('/login', userController.login);
 
- router.get('/login', (req, res) => {
-  res.send('Formulario de login');
- });
+// Registro de usuario
+router.post('/registro', userController.register);
+
+// Login de usuario
+router.post('/login', userController.login);
 
 
 module.exports = router;
