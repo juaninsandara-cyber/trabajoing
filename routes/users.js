@@ -13,6 +13,10 @@ router.post('/registro', userController.register);
 
 // Login de usuario
 router.post('/login', userController.login);
+//ingreso
+router.post('/ingreso', userController.registrarIngreso);
+//salida 
+router.post('/salida', userController.registrarSalida);
 
 
 module.exports = router;
