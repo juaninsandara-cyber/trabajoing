@@ -1,5 +1,6 @@
 const request = require('supertest');
-const app = require('../app')
+const app = require('../app');
+const sequelize = require('../config/database'); // importamos la conexión
 
 describe('User Login', () => {
   it('should login successfully with valid credentials', async () => {
@@ -18,5 +19,8 @@ describe('User Login', () => {
 
     expect(response.status).toBe(401);
   });
+});
 
+afterAll(async () => {
+  await sequelize.close();
 });
