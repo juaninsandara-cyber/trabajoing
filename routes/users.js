@@ -14,5 +14,11 @@ router.post('/registro', userController.register);
 // Login de usuario
 router.post('/login', userController.login);
 
+const ingresoController = require('../controllers/ingresoController');
+// ingreso 
+router.post('/ingreso', ingresoController.registrarIngreso);
+// salida 
+router.post('/salida', ingresoController.registrarSalida);
+
 
 module.exports = router;
