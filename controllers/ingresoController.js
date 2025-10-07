@@ -10,10 +10,10 @@ exports.registrarIngreso = async (req, res) => {
     // Verificar credenciales
     const user = await User.findOne({ where: { username, password } });
     if (!user) {
-      return res.status(401).json({ message: 'Credenciales inválidas' });
+      return res.status(401).json({ message: 'Credenciales incorrectas' });
     }
 
-    // Normalizar entradas (sin tildes y en minúsculas)
+    // Normalizar entradas sin tildes y en minúsculas
     const tipoAccesoNormalizado = tipoAcceso.toLowerCase().replace('í', 'i');
     const tipoVehiculoNormalizado = tipoVehiculo.toLowerCase();
 
@@ -33,7 +33,7 @@ exports.registrarIngreso = async (req, res) => {
       });
     }
 
-    // Contar vehículos dentro del parqueadero (sin horaSalida)
+    // Contar vehículos dentro del parqueadero sin hora salida
     const conteoActual = await Ingreso.count({
       where: {
         horaSalida: null,
@@ -81,7 +81,7 @@ exports.registrarSalida = async (req, res) => {
 
     // Verificar usuario
     const user = await User.findOne({ where: { username, password } });
-    if (!user) return res.status(401).json({ message: 'Credenciales inválidas' });
+    if (!user) return res.status(401).json({ message: 'Credenciales incorrectas' });
 
     // Buscar ingreso activo
     const ingreso = await Ingreso.findOne({
