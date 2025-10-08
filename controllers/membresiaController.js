@@ -5,9 +5,9 @@ exports.crearMembresia = async (req, res) => {
   try {
     const { username, password, tipo, duracion } = req.body;
 
-    // Verificar usuario
-    const user = await User.findOne({ where: { username } });
-    if (!user || !(await user.validarPassword(password))) {
+    // Verificar usuario - SIN validarPassword
+    const user = await User.findOne({ where: { username, password } }); // ← Buscar directo
+    if (!user) {
       return res.status(401).json({ message: 'Credenciales incorrectas' });
     }
 
@@ -34,12 +34,18 @@ exports.crearMembresia = async (req, res) => {
 
     res.status(201).json({
       message: `Membresía ${tipo} creada exitosamente`,
-      membresia
+      membresia: {
+        id: membresia.id,
+        tipo: membresia.tipo,
+        fechaInicio: membresia.fechaInicio,
+        fechaFin: membresia.fechaFin,
+        precio: membresia.precio
+      }
     });
 
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Error al crear membresía', error });
+    res.status(500).json({ message: 'Error al crear membresía', error: error.message });
   }
 };
 
@@ -47,8 +53,9 @@ exports.verificarMembresia = async (req, res) => {
   try {
     const { username, password } = req.body;
 
-    const user = await User.findOne({ where: { username } });
-    if (!user || !(await user.validarPassword(password))) {
+    // Verificar usuario - SIN validarPassword
+    const user = await User.findOne({ where: { username, password } });
+    if (!user) {
       return res.status(401).json({ message: 'Credenciales incorrectas' });
     }
 
@@ -69,22 +76,28 @@ exports.verificarMembresia = async (req, res) => {
     res.status(200).json({
       message: 'Membresía activa encontrada',
       tieneMembresia: true,
-      membresia: membresiaActiva
+      membresia: {
+        id: membresiaActiva.id,
+        tipo: membresiaActiva.tipo,
+        fechaInicio: membresiaActiva.fechaInicio,
+        fechaFin: membresiaActiva.fechaFin,
+        precio: membresiaActiva.precio
+      }
     });
 
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Error al verificar membresía', error });
+    res.status(500).json({ message: 'Error al verificar membresía', error: error.message });
   }
 };
 
-// 🔥 AGREGAR ESTA FUNCIÓN FALTANTE:
 exports.renovarMembresia = async (req, res) => {
   try {
     const { username, password, tipo, duracion } = req.body;
 
-    const user = await User.findOne({ where: { username } });
-    if (!user || !(await user.validarPassword(password))) {
+    // Verificar usuario - SIN validarPassword
+    const user = await User.findOne({ where: { username, password } });
+    if (!user) {
       return res.status(401).json({ message: 'Credenciales incorrectas' });
     }
 
@@ -119,11 +132,17 @@ exports.renovarMembresia = async (req, res) => {
 
     res.status(201).json({
       message: `Membresía renovada exitosamente`,
-      membresia: nuevaMembresia
+      membresia: {
+        id: nuevaMembresia.id,
+        tipo: nuevaMembresia.tipo,
+        fechaInicio: nuevaMembresia.fechaInicio,
+        fechaFin: nuevaMembresia.fechaFin,
+        precio: nuevaMembresia.precio
+      }
     });
 
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Error al renovar membresía', error });
+    res.status(500).json({ message: 'Error al renovar membresía', error: error.message });
   }
 };

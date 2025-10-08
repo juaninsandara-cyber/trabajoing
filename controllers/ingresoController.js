@@ -34,7 +34,7 @@ exports.registrarIngreso = async (req, res) => {
   try {
     const { username, password, placa, tipoVehiculo, tipoAcceso } = req.body;
 
-    console.log(' Intentando registro de ingreso:', { username, placa });
+    console.log('🚗 Intentando registro de ingreso:', { username, placa });
 
     // Validar datos
     const erroresValidacion = validarDatosIngreso(req.body);
@@ -118,7 +118,7 @@ exports.registrarIngreso = async (req, res) => {
     });
 
     res.status(201).json({
-      message: 'Ingreso registrado con éxito',
+      message: '✅ Ingreso registrado con éxito',
       factura: ticketPago ? {
         numero: ticketPago,
         placa: placaNormalizada,
@@ -131,7 +131,60 @@ exports.registrarIngreso = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error al registrar ingreso:', error);
+    console.error('❌ Error al registrar ingreso:', error);
+    res.status(500).json({ 
+      message: 'Error interno del servidor',
+      error: error.message 
+    });
+  }
+};
+
+// Registrar salida
+exports.registrarSalida = async (req, res) => {
+  try {
+    const { username, password, placa } = req.body;
+
+    console.log('🚪 Intentando registrar salida:', { username, placa });
+
+    // Verificar usuario
+    const user = await User.findOne({ where: { username, password } });
+    if (!user) {
+      return res.status(401).json({ message: 'Credenciales incorrectas' });
+    }
+
+    // Buscar ingreso activo
+    const ingreso = await Ingreso.findOne({
+      where: {
+        userId: user.id,
+        placa: placa.toUpperCase(),
+        horaSalida: null
+      }
+    });
+
+    if (!ingreso) {
+      return res.status(404).json({ 
+        message: 'No hay ingreso activo para esta placa',
+        error: 'NO_ACTIVE_ENTRY'
+      });
+    }
+
+    // Registrar salida
+    ingreso.horaSalida = new Date();
+    await ingreso.save();
+
+    res.status(200).json({
+      message: '✅ Salida registrada con éxito',
+      ingreso: {
+        id: ingreso.id,
+        placa: ingreso.placa,
+        tipoVehiculo: ingreso.tipoVehiculo,
+        horaEntrada: ingreso.horaEntrada,
+        horaSalida: ingreso.horaSalida
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Error al registrar salida:', error);
     res.status(500).json({ 
       message: 'Error interno del servidor',
       error: error.message 

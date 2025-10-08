@@ -41,12 +41,7 @@ const User = sequelize.define('User', {
   }
 }, {
   timestamps: true
- 
-});
 
-module.exports = User;
-User.prototype.validarPassword = async function(password) {
-  return await bcrypt.compare(password, this.password);
-};
+});
 
 module.exports = User;
