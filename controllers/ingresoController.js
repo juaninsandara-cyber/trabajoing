@@ -34,7 +34,7 @@ exports.registrarIngreso = async (req, res) => {
   try {
     const { username, password, placa, tipoVehiculo, tipoAcceso } = req.body;
 
-    console.log('🚗 Intentando registro de ingreso:', { username, placa });
+    console.log('Intentando registro de ingreso:', { username, placa });
 
     // Validar datos
     const erroresValidacion = validarDatosIngreso(req.body);
@@ -118,7 +118,7 @@ exports.registrarIngreso = async (req, res) => {
     });
 
     res.status(201).json({
-      message: '✅ Ingreso registrado con éxito',
+      message: 'Ingreso registrado con éxito',
       factura: ticketPago ? {
         numero: ticketPago,
         placa: placaNormalizada,
@@ -131,7 +131,7 @@ exports.registrarIngreso = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Error al registrar ingreso:', error);
+    console.error('Error al registrar ingreso:', error);
     res.status(500).json({ 
       message: 'Error interno del servidor',
       error: error.message 
@@ -144,7 +144,7 @@ exports.registrarSalida = async (req, res) => {
   try {
     const { username, password, placa } = req.body;
 
-    console.log('🚪 Intentando registrar salida:', { username, placa });
+    console.log('Intentando registrar salida:', { username, placa });
 
     // Verificar usuario
     const user = await User.findOne({ where: { username, password } });
@@ -173,7 +173,7 @@ exports.registrarSalida = async (req, res) => {
     await ingreso.save();
 
     res.status(200).json({
-      message: '✅ Salida registrada con éxito',
+      message: 'Salida registrada con éxito',
       ingreso: {
         id: ingreso.id,
         placa: ingreso.placa,
@@ -184,7 +184,7 @@ exports.registrarSalida = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Error al registrar salida:', error);
+    console.error(' Error al registrar salida:', error);
     res.status(500).json({ 
       message: 'Error interno del servidor',
       error: error.message 

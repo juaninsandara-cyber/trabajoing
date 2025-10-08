@@ -5,7 +5,7 @@ exports.crearMembresia = async (req, res) => {
   try {
     const { username, password, tipo, duracion } = req.body;
 
-    // Verificar usuario - SIN validarPassword
+    // Verificar usuario -
     const user = await User.findOne({ where: { username, password } }); // ← Buscar directo
     if (!user) {
       return res.status(401).json({ message: 'Credenciales incorrectas' });

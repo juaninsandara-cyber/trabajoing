@@ -47,20 +47,20 @@ exports.login = async (req, res) => {
 
     console.log('🔍 Buscando usuario para login:', username);
     
-    // Buscar usuario con username Y password (texto plano)
+    // Buscar usuario con username Y password 
     const user = await User.findOne({ 
       where: { 
         username: username,
-        password: password  // ← Comparación directa, SIN bcrypt
+        password: password  
       } 
     });
     
     if (!user) {
-      console.log('❌ Usuario no encontrado o contraseña incorrecta');
+      console.log('Usuario no encontrado o contraseña incorrecta');
       return res.status(401).json({ message: 'Credenciales inválidas' });
     }
 
-    console.log('✅ Login exitoso para:', username);
+    console.log('Login exitoso para:', username);
     res.status(200).json({
       message: 'Login exitoso',
       user: {
