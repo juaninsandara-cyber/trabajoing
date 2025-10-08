@@ -1,65 +1,127 @@
-# Proyecto Backend
+FASTPARK UNI - Sistema de Gestión de Parqueadero
+---Descripción
+Sistema backend para la gestión digital de parqueaderos universitarios. Desarrollado con Node.js, Express y MySQL, permite el control de ingresos, salidas, membresías y generación de facturas en tiempo real.
 
-Este proyecto es un backend desarrollado con Node.js, Express y Sequelize, siguiendo el patrón de diseño MVC.  
-Incluye conexión a base de datos MySQL, autenticación básica de usuarios y pruebas con Jest + Supertest.
+---- Características Principales
+ Autenticación y Usuarios
+Registro y login de usuarios
 
+-Roles de usuario (admin, user, empleado)
 
-## Características
-- Arquitectura basada en MVC (Model - View - Controller).
-- Conexión a base de datos MySQL usando Sequelize ORM.
-- Rutas para manejo de usuarios (login y registro).
-- Pruebas unitarias y de integración con Jest y Supertest.
-- Manejo de variables de entorno con dotenv.
+Gestión de perfiles y permisos
 
+ - Gestión de Parqueadero
+Registro de ingresos y salidas de vehículos
 
-## Estructura del proyecto
+Control de cupos por tipo de vehículo (carro/moto)
+
+Sistema de membresías y acceso por día
+
+Validación de datos en tiempo real
+
+---Dashboard y Reportes
+Visualización de vehículos activos en el parqueadero
+
+Control de cupos disponibles
+
+Generación automática de facturas
+
+Historial de movimientos del día
+
+--Calidad del Código
+Arquitectura MVC bien definida
+
+Pruebas unitarias e integración con Jest
+
+ORM Sequelize para gestión de base de datos
+
+Validación de datos y manejo de errores
+----Arquitectura del Proyecto---
 proyecto_par/
-│── config/ # Configuración de base de datos
-│── controllers/ # Controladores (lógica de negocio)
-│── models/ # Modelos Sequelize
-│── routes/ # Rutas del backend
-│── tests/ # Pruebas (Jest + Supertest)
-│── app.js # Configuración principal de Express
-│── package.json # Dependencias y scripts
-│── .env # Variables de entorno
-│── README.md # Documentación del proyecto
+├── config/                 # Configuración de base de datos
+│   ├── database.js           # Conexión Sequelize
+│   └── config.js             # Configuración para migraciones
+├── controllers/            # Lógica de negocio
+│   ├── userController.js     # Gestión de usuarios
+│   ├── ingresoController.js  # Control de ingresos/salidas
+│   ├── membresiaController.js # Sistema de membresías
+│   └── activosController.js  # Dashboard y reportes
+├── models/                # Modelos de base de datos
+│   ├── user.js              # Modelo Usuario
+│   ├── ingreso.js           # Modelo Registro de movimientos
+│   ├── membresia.js         # Modelo Membresías
+│   └── index.js             # Relaciones y exportación
+├── routes/                # Definición de rutas API
+│   ├── users.js             # Rutas de usuarios
+│   ├── membresias.js        # Rutas de membresías
+│   └── activos.js           # Rutas del dashboard
+├── tests/                # Suite de pruebas
+│   ├── user.test.js         # Pruebas de usuarios
+│   └── basic.test.js        # Pruebas básicas del sistema
+├── 📄 app.js               # Configuración principal de Express
+├── 📄 package.json         # Dependencias y scripts
+├── 📄 .env                 # Variables de entorno
+└── 📄 README.md           # Documentación
 
+----Tecnologías Utilizadas-----
 
-- Node.js (v16 o superior recomendado)
-- MySQL instalado y corriendo en el puerto `3306`
-- npm  para gestionar dependencias
+Backend: Node.js, Express.js
+Base de Datos: MySQL + Sequelize ORM
+Autenticación: JWT (JSON Web Tokens)
+Pruebas: Jest + Supertest
+Variables de Entorno: dotenv
+Control de Versiones: GitHub
 
----
-
-# Instalación
-1. Clona el repositorio:
-   git bash.
-   git clone el repositorio .
-   cd proyecto_par.
-2. instalar dependencias:
-   - npm install.
-3. env.
-   DB_NAME=tienda_v1
-   DB_USER=root
-   DB_PASS=root
-   DB_HOST=localhost
-   DB_PORT=3306
-4. Ejecucion del servidor.
-   npm start
-   //si todo ejecuta bien te aparece los siguientes mensajes
-   - Conexión a la base de datos exitosa
-   - Tablas sincronizadas
-5. Para las pruebas tienes que ejecutar el sigueinte comando.
-   . npm test
-6. Para hacer las pruebas con postman se necesita lo siguientes
-   -  http://localhost:3000/users/login. // todos con  raw y json este para login
-   -  http://localhost:3000/users/registro. // todos con  raw y json este para registro
-     PARA REGISTRO USAR ESTO:
-   {
-  "username": "juan",
-  "password": "duros"
+-----Instalación y Configuración---
+Requisitos
+Node.js (v16 o superior)
+MySQL Server 8.0+
+npm 
+----Clonar el Repositorio( git clone)
+----Instalar dependencias (npm install)
+----Crear base de datos en MySQL (CREATE DATABASE parqueadero_db;)
+----Ejecutar programa( npm start)
+----Para las pruebas( npm test)
+------- Pruebas con el postman --------
+-- Registro --
+POST /users/registro
+{
+  "username": "usuario123",
+  "password": "contraseñaSegura"
 }
-Puede ser cualquier nombre igual te lo guarda en el mysql.
+-- Login --
+POST /users/login
+{
+  "username": "usuario123", 
+  "password": "contraseñaSegura"
+}
+-- ingreso --
+POST /users/ingreso
+{
+  "username": "usuario123",
+  "password": "contraseñaSegura", 
+  "placa": "ABC123",
+  "tipoVehiculo": "carro",
+  "tipoAcceso": "día"
+}
+-- Salida --
+POST /users/salida
+{
+  "username": "usuario123",
+  "password": "contraseñaSegura",
+  "placa": "ABC123"
+}
+-- Membresias --
+POST /membresias/crear
+{
+  "username": "usuario123",
+  "password": "contraseñaSegura",
+  "tipo": "mensual",
+  "duracion": 1
+}
+
+
+
   
 
 
