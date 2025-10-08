@@ -87,7 +87,8 @@ npm
 POST /users/registro
 {
   "username": "usuario123",
-  "password": "contraseñaSegura"
+  "password": "contraseñaSegura",
+  "email": "usuario123@email.com"
 }
 -- Login --
 POST /users/login
