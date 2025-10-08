@@ -70,7 +70,7 @@ exports.login = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('🔥 ERROR en login:', error.message);
+    console.error(' ERROR en login:', error.message);
     res.status(500).json({ message: 'Error del servidor', error: error.message });
   }
 };
