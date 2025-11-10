@@ -32,4 +32,7 @@ if (process.env.NODE_ENV !== 'test') {
 
 const activosRouter = require('./routes/activos');
 app.use('/activos', activosRouter);
+
+const notificacionRoutes = require('./routes/notificaciones');
+app.use('/notificaciones', notificacionRoutes);
 module.exports = app;
