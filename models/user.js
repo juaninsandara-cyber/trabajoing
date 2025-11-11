@@ -22,7 +22,7 @@ const User = sequelize.define('User', {
 
 
 module.exports = User;
-=======
+
 'use strict';
 
 module.exports = (sequelize, DataTypes) => {
