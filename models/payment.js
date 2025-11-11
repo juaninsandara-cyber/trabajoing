@@ -1,0 +1,59 @@
+'use strict';
+
+module.exports = (sequelize, DataTypes) => {
+  const Payment = sequelize.define('Payment', {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
+    external_id: {
+      type: DataTypes.STRING
+    },
+    userId: {
+      type: DataTypes.INTEGER
+    },
+    type: {
+      type: DataTypes.ENUM('membresia', 'parqueadero', 'recarga')
+    },
+    amount: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    currency: {
+      type: DataTypes.STRING,
+      defaultValue: 'COP'
+    },
+    status: {
+      type: DataTypes.STRING
+    },
+    parking_spot: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    parking_duration_minutes: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    raw: {
+      type: DataTypes.JSON,
+      allowNull: true
+    }
+  }, {
+    tableName: 'payments',
+    timestamps: true
+  });
+
+  Payment.associate = function(models) {
+    // SOLO si existe User
+    if (models.User) {
+      Payment.belongsTo(models.User, {
+        foreignKey: 'userId',
+        as: 'user'
+      });
+    }
+  };
+
+  return Payment;
+};
+
