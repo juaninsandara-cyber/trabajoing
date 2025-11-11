@@ -1,6 +1,8 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-
+const express = require('express');
+const router = express.Router();
+const userController = require('../controllers/userController');
 const User = sequelize.define('User', {
   id: {
     type: DataTypes.INTEGER,
@@ -43,5 +45,8 @@ const User = sequelize.define('User', {
   timestamps: true
 
 });
+
+
+
 
 module.exports = User;
