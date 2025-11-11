@@ -25,7 +25,7 @@ exports.pagarMembresia = async (req, res) => {
       return res.status(400).json({ error: "Tipo de membresía inválido" });
     }
 
-    // ✅ Crear preferencia con API REST
+    //  Crear preferencia con API REST
     const pref = await createPreference({
       items: [
         {
@@ -41,8 +41,8 @@ exports.pagarMembresia = async (req, res) => {
     const initPoint = pref.init_point || pref.sandbox_init_point;
 
     if (!initPoint) {
-      console.error("❌ MercadoPago no devolvió init_point", pref);
-      return res.status(500).json({ error: "MercadoPago no devolvió init_point" });
+      console.error(" MercadoPago no devolvió init_point", pref);
+      return res.status(500).json({ error: "MercadoPago no devolvió init_point", raw: pref });
     }
 
     const qr = generateQrUrlFromString(initPoint);
@@ -54,8 +54,18 @@ exports.pagarMembresia = async (req, res) => {
     });
 
   } catch (err) {
-    console.error("❌ Error interno en membresías:", err.response?.data || err);
-    res.status(500).json({ error: "Error interno en membresías" });
+    // Captura completa del error
+    console.error(" Error interno en membresías:", err.response?.data || err);
+
+    res.status(500).json({
+      error: "Error interno en membresías",
+      message: err.message || null,
+      code: err.code || null,
+      status: err.status || 500,
+      blocked_by: err.blocked_by || null,
+      raw: err.response?.data || err
+    });
   }
 };
+	
 

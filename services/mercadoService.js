@@ -1,11 +1,11 @@
 'use strict';
 
-console.log("✅ CARGANDO ARCHIVO MERCADO SERVICE DESDE:", __filename);
+console.log(" CARGANDO ARCHIVO MERCADO SERVICE DESDE:", __filename);
 
 require('dotenv').config();
 const { MercadoPagoConfig, Preference, Payment } = require('mercadopago');
 
-// ✅ Configuración SDK
+//  Configuración SDK
 const client = new MercadoPagoConfig({
   accessToken: process.env.MP_ACCESS_TOKEN
 });
@@ -14,7 +14,7 @@ async function createPreference({ items, external_reference }) {
 
   const preference = new Preference(client);
 
-  // ✅ Formato correcto según MP SDK v2 (2024+)
+  //  Formato correcto según MP SDK v2 (2024+)
   const response = await preference.create({
     preference: {
       items: items,
