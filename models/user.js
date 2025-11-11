@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+HEAD
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 const express = require('express');
@@ -47,5 +47,4 @@ module.exports = (sequelize, DataTypes) => {
   };
 
   return User;
-};
->>>>>>> feature/pagos-mercadopago-parqueadero
+}; feature/pagos-mercadopago-parqueadero
