@@ -13,6 +13,31 @@ const transporter = nodemailer.createTransport({
 });
 
 class NotificacionController {
+    async verificarYNotificarOcupacion(req, res) {
+    try {
+        console.log('🔍 Verificando ocupación...');
+        res.json({
+            mensaje: 'Función en desarrollo - Prueba usar /prueba-correo',
+            status: 'ok'
+        });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ error: 'Error interno' });
+    }
+}
+
+async getEstadoParqueadero(req, res) {
+    try {
+        console.log('📊 Obteniendo estado...');
+        res.json({
+            mensaje: 'Función en desarrollo - Prueba usar /prueba-correo', 
+            status: 'ok'
+        });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ error: 'Error interno' });
+    }
+}
     
     async pruebaEnvioCorreo(req, res) {
         try {
@@ -55,13 +80,13 @@ class NotificacionController {
                         subject: asunto,
                         html: `
                             <div style="font-family: Arial, sans-serif; padding: 20px;">
-                                <h2 style="color: #007bff;">🧪 Prueba de Notificación</h2>
+                                <h2 style="color: #007bff;"> Prueba de Notificación</h2>
                                 <p>Hola <strong>${nombre}</strong>,</p>
                                 <p>Esta es una <strong>prueba del sistema de notificaciones</strong> del parqueadero.</p>
                                 <p>Cuando el parqueadero esté por llenarse (80%+ de ocupación), recibirás una alerta automática.</p>
                                 <p><strong>Tu membresía:</strong> ${membresiaItem.tipo}</p>
                                 <br>
-                                <p style="color: #28a745; font-weight: bold;">✅ Si recibes este correo, el sistema está funcionando correctamente.</p>
+                                <p style="color: #28a745; font-weight: bold;">Si recibes este correo, el sistema está funcionando correctamente.</p>
                             </div>
                         `
                     };
@@ -109,6 +134,7 @@ class NotificacionController {
             });
         }
     }
+
 }
 
 module.exports = new NotificacionController();

@@ -22,7 +22,7 @@ exports.obtenerVehiculosActivos = async (req, res) => {
     const motosActivas = vehiculosActivos.filter(v => v.tipoVehiculo === 'moto').length;
 
     res.status(200).json({
-      message: `🅿️ Vehículos en parqueadero: ${totalActivos}`,
+      message: ` Vehículos en parqueadero: ${totalActivos}`,
       estadisticas: {
         total: totalActivos,
         carros: carrosActivos,
