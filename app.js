@@ -5,6 +5,8 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var paymentsRouter = require('./routes/payments');
+
 
 var app = express();
 
@@ -16,12 +18,14 @@ app.use(cookieParser());
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/payments', paymentsRouter);
+
 //pruebas
 const sequelize = require('./config/database');
 
 sequelize.authenticate()
-  .then(() => console.log('✅ Conexión a la base de datos exitosa'))
-  .catch(err => console.error('❌ Error de conexión a la base de datos:', err));
+  .then(() => console.log(' Conexión a la base de datos exitosa'))
+  .catch(err => console.error(' Error de conexión a la base de datos:', err));
 
 
 module.exports = app;
