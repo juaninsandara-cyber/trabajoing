@@ -1,8 +1,9 @@
+'use strict';
+
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-const express = require('express');
-const router = express.Router();
-const userController = require('../controllers/userController');
+
+// Definición del modelo User
 const User = sequelize.define('User', {
   id: {
     type: DataTypes.INTEGER,
@@ -42,11 +43,18 @@ const User = sequelize.define('User', {
     defaultValue: 'activo'
   }
 }, {
+<<<<<<< HEAD
   timestamps: true
 
+=======
+  tableName: 'users',
+  timestamps: true // createdAt y updatedAt
+>>>>>>> felipe
 });
 
-
-
+// Relaciones del modelo (si las necesitas)
+User.associate = function(models) {
+  // Por ejemplo: User.hasMany(models.Payment)
+};
 
 module.exports = User;
