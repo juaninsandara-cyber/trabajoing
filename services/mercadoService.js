@@ -1,35 +1,32 @@
-'use strict';
-
+﻿// services/mercadoService.js - Versión mínima funcional
 console.log(" CARGANDO ARCHIVO MERCADO SERVICE DESDE:", __filename);
 
 require('dotenv').config();
-const { MercadoPagoConfig, Preference, Payment } = require('mercadopago');
+const { MercadoPagoConfig, Preference } = require('mercadopago');
 
-//  Configuración SDK
 const client = new MercadoPagoConfig({
   accessToken: process.env.MP_ACCESS_TOKEN
 });
 
 async function createPreference({ items, external_reference }) {
-
   const preference = new Preference(client);
 
-  //  Formato correcto según MP SDK v2 (2024+)
-  const response = await preference.create({
-    preference: {
-      items: items,
-      external_reference: external_reference,
-
-      back_urls: {
-        success: "http://localhost:3000/payments/success",
-        failure: "http://localhost:3000/payments/failure",
-        pending: "http://localhost:3000/payments/pending"
-      },
-
-      auto_return: "approved"
+  const requestBody = {
+    body: {
+      items: items.map(item => ({
+        title: item.title.substring(0, 255), // Máximo 255 chars
+        quantity: Number(item.quantity),
+        unit_price: Number(item.unit_price),
+        currency_id: "COP"
+      })),
+      external_reference: external_reference.substring(0, 256)
     }
-  });
+  };
 
+  console.log("📦 Creando preferencia en MP...");
+  const response = await preference.create(requestBody);
+  console.log("✅ Preferencia creada:", response.id);
+  
   return response;
 }
 
@@ -37,13 +34,7 @@ function generateQrUrlFromString(url) {
   return `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
 }
 
-async function getPaymentInfo(payment_id) {
-  const payment = new Payment(client);
-  return await payment.get({ id: payment_id });
-}
-
 module.exports = {
   createPreference,
-  generateQrUrlFromString,
-  getPaymentInfo
+  generateQrUrlFromString
 };

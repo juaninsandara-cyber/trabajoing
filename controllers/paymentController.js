@@ -1,12 +1,10 @@
-'use strict';
-
-const {
-  createPreference,
-  generateQrUrlFromString
-} = require('../services/mercadoService');
+﻿// controllers/paymentController.js - VERSIÓN CON GUARDADO EN BD
+const Payment = require('../models/Payment');
 
 exports.pagarMembresia = async (req, res) => {
   try {
+    console.log("📨 Body recibido:", JSON.stringify(req.body, null, 2));
+    
     const { userId, tipo } = req.body;
 
     if (!userId || !tipo) {
@@ -25,8 +23,8 @@ exports.pagarMembresia = async (req, res) => {
       return res.status(400).json({ error: "Tipo de membresía inválido" });
     }
 
-    //  Crear preferencia con API REST
-    const pref = await createPreference({
+    // Crear preferencia en Mercado Pago
+    const pref = await require('../services/mercadoService').createPreference({
       items: [
         {
           title: `Membresia ${tipo}`,
@@ -41,31 +39,45 @@ exports.pagarMembresia = async (req, res) => {
     const initPoint = pref.init_point || pref.sandbox_init_point;
 
     if (!initPoint) {
-      console.error(" MercadoPago no devolvió init_point", pref);
-      return res.status(500).json({ error: "MercadoPago no devolvió init_point", raw: pref });
+      console.error("MercadoPago no devolvió init_point", pref);
+      return res.status(500).json({ error: "MercadoPago no devolvió init_point" });
     }
 
-    const qr = generateQrUrlFromString(initPoint);
+    // 🔥 GUARDAR EN BASE DE DATOS
+    const paymentRecord = await Payment.create({
+      userId: userId,
+      tipoMembresia: tipo,
+      monto: amount,
+      preferenceId: pref.id,
+      status: 'pending'
+    });
 
+    console.log("💾 Pago guardado en BD con ID:", paymentRecord.id);
+
+    const qr = require('../services/mercadoService').generateQrUrlFromString(initPoint);
+
+    console.log("✅ Pago creado exitosamente - ID BD:", paymentRecord.id);
+    
     return res.json({
-      message: "Preferencia creada",
+      success: true,
+      message: "Preferencia creada y guardada en BD",
+      paymentId: paymentRecord.id, // ← NUEVO: ID en tu BD
+      preference_id: pref.id,
       init_point: initPoint,
-      qr
+      qr: qr,
+      monto: amount,
+      tipo: tipo
     });
 
   } catch (err) {
-    // Captura completa del error
-    console.error(" Error interno en membresías:", err.response?.data || err);
-
+    console.error("💥 Error completo en controlador:", err);
+    
     res.status(500).json({
-      error: "Error interno en membresías",
-      message: err.message || null,
-      code: err.code || null,
-      status: err.status || 500,
-      blocked_by: err.blocked_by || null,
-      raw: err.response?.data || err
+      success: false,
+      error: "Error interno en membresías", 
+      message: err.message,
+      status: err.status,
+      details: err.cause
     });
   }
 };
-	
-
