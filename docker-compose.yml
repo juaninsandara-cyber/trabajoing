@@ -1,43 +1,33 @@
 services:
   mysql_db:
-    image: mysql:8.4
+    image: mysql:8.0
     container_name: mysql_db
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root123
-      MYSQL_DATABASE: mi_app
-      MYSQL_USER: user
-      MYSQL_PASSWORD: pass
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: tienda_v1
+      MYSQL_USER: app_user
+      MYSQL_PASSWORD: app_pass
     ports:
       - "3306:3306"
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 5s
-      timeout: 3s
+      timeout: 10s
       retries: 5
-    deploy:
-      resources:
-        limits:
-          cpus: "0.5"      # Limita el uso de CPU
-          memory: 512M     # Limita la memoria a 512 MB
-    ulimits:
-      nproc: 100          # Máximo 100 procesos
-      nofile: 500          # Máximo 500 archivos abiertos
 
-  mi_app_mvc:
+  app:
     build: .
     container_name: mi_app_mvc
-    restart: on-failure:3   # Máximo 3 reinicios
-    ports:
-      - "3000:3000"
+    restart: always
     depends_on:
       mysql_db:
-        condition: service_healthy   # Espera a que MySQL esté listo
-    deploy:
-      resources:
-        limits:
-          cpus: "1.0"       # 1 núcleo de CPU
-          memory: 256M      # 256 MB de RAM
-    ulimits:
-      nproc: 150
-      nofile: 500
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    environment:
+      DB_HOST: mysql_db
+      DB_USER: app_user
+      DB_PASS: app_pass
+      DB_NAME: tienda_v1
+      NODE_ENV: production
+      PORT: 3000

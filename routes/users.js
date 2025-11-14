@@ -1,17 +1,21 @@
-var express = require('express');
-var router = express.Router();
+// routes/users.js
+const express = require('express');
+const router = express.Router();
+
+// Controladores
 const userController = require('../controllers/userController');
-
-
-router.get('/', function(req, res, next) {
-  res.send('SAUVE ESA PARTE');
-});
-
 const ingresoController = require('../controllers/ingresoController');
 
-router.post('/login', userController.login);
-router.post('/registro', userController.registro); // ← AQUÍ ESTABA EL ERROR
+// Ruta base de prueba
+router.get('/', (req, res) => {
+  res.send('API funcionando correctamente en /users');
+});
 
+//  Rutas de autenticación
+router.post('/login', userController.login);
+router.post('/registro', userController.register);
+
+// Rutas de ingreso/salida
 router.post('/ingreso', ingresoController.registrarIngreso);
 router.post('/salida', ingresoController.registrarSalida);
 

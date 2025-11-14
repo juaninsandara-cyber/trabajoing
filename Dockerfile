@@ -1,21 +1,19 @@
-# Usa una imagen ligera de Node.js
 FROM node:18-alpine
 
-# Establece el directorio de trabajo
+# Crear directorio de trabajo
 WORKDIR /usr/src/app
 
-# Copia los archivos de configuración y dependencias
+# Copiar los archivos necesarios para instalar dependencias
 COPY package*.json ./
 
-# Instala dependencias
+# Instalar dependencias de producción
 RUN npm install --production
 
-# Copia el resto del código
+# Copiar todo el código de la app
 COPY . .
 
-# Expone el puerto de tu aplicación
+# Exponer el puerto (coincide con tu .env -> PORT=3000)
 EXPOSE 3000
 
-# Comando para iniciar la app
-
+# Comando para ejecutar la app
 CMD ["npm", "start"]

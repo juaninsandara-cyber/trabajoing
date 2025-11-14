@@ -1,6 +1,7 @@
+// models/user.js
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
-<<<<<<< HEAD
+const { sequelize } = require('./index');
+const bcrypt = require('bcryptjs');
 
 const User = sequelize.define('User', {
   username: {
@@ -11,80 +12,31 @@ const User = sequelize.define('User', {
   password: {
     type: DataTypes.STRING,
     allowNull: false
-  }
-}, {
-  timestamps: true // createdAt y updatedAt
-});
-
-module.exports = User;
-=======
-const crypto = require('crypto');
-
-const User = sequelize.define('User', {
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true
-  },
-  username: {
-    type: DataTypes.STRING(50),
-    allowNull: false,
-    unique: true,
-    validate: {
-      len: [3, 50],
-      notEmpty: true
-    }
-  },
-  password: {
-    type: DataTypes.STRING(255),
-    allowNull: false,
-    validate: {
-      len: [6, 255]
-    }
   },
   email: {
-    type: DataTypes.STRING(100),
-    allowNull: false,
-    unique: true,
-    validate: {
-      isEmail: true
-    }
+    type: DataTypes.STRING,
+    allowNull: true
   },
   role: {
-    type: DataTypes.ENUM('admin', 'user', 'empleado'),
+    type: DataTypes.STRING,
+    allowNull: true,
     defaultValue: 'user'
-  },
-  estado: {
-    type: DataTypes.ENUM('activo', 'inactivo', 'suspendido'),
-    defaultValue: 'activo'
   }
 }, {
-  timestamps: true,
+  tableName: 'users',
+  timestamps: false,
   hooks: {
-    beforeCreate: (user) => {
-      if (user.password) {
-        user.password = hashPassword(user.password);
-      }
-    },
-    beforeUpdate: (user) => {
-      if (user.changed('password')) {
-        user.password = hashPassword(user.password);
-      }
+    async beforeCreate(user) {
+      // Encriptar contraseña
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(user.password, salt);
     }
   }
 });
 
-function hashPassword(password) {
-  return crypto
-    .createHash('sha256')
-    .update(password)
-    .digest('hex');
-}
 
-User.prototype.validarPassword = function(password) {
-  const hashedPassword = hashPassword(password);
-  return this.password === hashedPassword;
+User.prototype.validarPassword = async function(password) {
+  return await bcrypt.compare(password, this.password);
 };
 
 module.exports = User;
->>>>>>> c786a63 (feat: deploy secure API with authentication, rate limiting, and security measures)
