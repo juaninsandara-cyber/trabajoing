@@ -4,13 +4,9 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const dotenv = require('dotenv');
-dotenv.config();
+
 
 var app = express();
-
-
-
-
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var paymentsRouter = require('./routes/payments');
@@ -24,8 +20,6 @@ const notificacionRoutes = require('./routes/notificaciones');
 
 // Configuración básica
 app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 // Conexión base de datos con reintento
