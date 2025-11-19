@@ -37,5 +37,8 @@ app.use('/activos', activosRouter);
 
 const notificacionRoutes = require('./routes/notificaciones');
 app.use('/notificaciones', notificacionRoutes);
+const { swaggerUi, swaggerSpec } = require('./config/swagger');
+
+app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 module.exports = app;
