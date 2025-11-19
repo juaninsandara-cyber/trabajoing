@@ -1,3 +1,4 @@
+
 const express = require('express');
 const router = express.Router();
 
@@ -9,3 +10,4 @@ router.post('/verificar', membresiaController.verificarMembresia);
 router.post('/renovar', membresiaController.renovarMembresia); 
 
 module.exports = router;
+
