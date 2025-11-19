@@ -1,24 +1,38 @@
-// models/ingreso.js
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('./index'); // usa la instancia global de conexión
+module.exports = (sequelize, DataTypes) => {
+  const Ingreso = sequelize.define('Ingreso', {
+    placa: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    tipoVehiculo: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    tipoAccesso: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    ticketPago: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    horaEntrada: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW
+    },
+    horaSalida: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    }
+  }, {
+    tableName: 'ingresos',
+    timestamps: false
+  });
 
-const Ingreso = sequelize.define('Ingreso', {
-  descripcion: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  monto: {
-    type: DataTypes.FLOAT,
-    allowNull: false,
-  },
-  fecha: {
-    type: DataTypes.DATE,
-    allowNull: false,
-    defaultValue: DataTypes.NOW,
-  },
-}, {
-  tableName: 'ingresos',
-  timestamps: false,
-});
-
-module.exports = Ingreso;
+  return Ingreso;
+};

@@ -8,7 +8,7 @@ router.post('/', async (req, res) => {
   try {
     const { placa, tipoVehiculo, tipoAccesso, ticketPago, horaEntrada, horaSalida, userId } = req.body;
 
-    // ✅ VALIDACIONES CORREGIDAS (tipoAccesso con doble 's')
+    // VALIDACIONES CORREGIDAS (tipoAccesso con doble 's')
     if (!placa || !tipoVehiculo || !tipoAccesso) {
       return res.status(400).json({ 
         error: 'Placa, tipo de vehículo y tipo de acceso son requeridos' 

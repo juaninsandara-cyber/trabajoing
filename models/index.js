@@ -1,7 +1,7 @@
 const { Sequelize, DataTypes } = require('sequelize');
-const bcrypt = require('bcryptjs'); // ← agregado para encriptar
+const bcrypt = require('bcryptjs');
 
-// Usa las variables de entorno de tu .env
+// Usa las variables de entorno del .env
 const sequelize = new Sequelize(
   process.env.DB_NAME || 'mi_base_datos',
   process.env.DB_USER || 'root',
@@ -14,7 +14,9 @@ const sequelize = new Sequelize(
   }
 );
 
-// --- MODELO DE USUARIO ---
+// ==============================
+// MODELO USER
+// ==============================
 const User = sequelize.define('User', {
   username: {
     type: DataTypes.STRING,
@@ -24,12 +26,10 @@ const User = sequelize.define('User', {
   password: {
     type: DataTypes.STRING,
     allowNull: false,
-  },
+  }
 }, {
   tableName: 'users',
   timestamps: false,
-
-  // ← AGREGADO: encriptar contraseña antes de crear
   hooks: {
     beforeCreate: async (user) => {
       const salt = await bcrypt.genSalt(10);
@@ -44,7 +44,9 @@ const User = sequelize.define('User', {
   }
 });
 
-// --- MODELO DE MEMBRESÍA ---
+// ==============================
+// MODELO MEMBRESÍA
+// ==============================
 const Membresia = sequelize.define('Membresia', {
   tipo: {
     type: DataTypes.STRING,
@@ -59,9 +61,38 @@ const Membresia = sequelize.define('Membresia', {
   timestamps: false,
 });
 
-// --- RELACIONES ---
+// ==============================
+// MODELO INGRESO (CORRECTO)
+// ==============================
+const Ingreso = require('./ingreso')(sequelize, DataTypes);
+
+// ==============================
+// RELACIONES
+// ==============================
 User.hasMany(Membresia, { foreignKey: 'userId' });
 Membresia.belongsTo(User, { foreignKey: 'userId' });
 
-// --- EXPORTAR ---
-module.exports = { sequelize, User, Membresia };
+User.hasMany(Ingreso, { foreignKey: 'userId' });
+Ingreso.belongsTo(User, { foreignKey: 'userId' });
+
+// ==============================
+// EXPORTAR MODELOS (UNA SOLA VEZ)
+// ==============================
+module.exports = { sequelize, User, Membresia, Ingreso };
+
+// ==============================
+// INICIALIZAR BASE DE DATOS
+// ==============================
+async function initializeDatabase() {
+  try {
+    await sequelize.authenticate();
+    console.log(' Conexión a BD establecida');
+
+    await sequelize.sync({ force: false });
+    console.log(' Tablas sincronizadas/creadas correctamente');
+  } catch (error) {
+    console.error(' Error iniciando base de datos:', error);
+  }
+}
+
+initializeDatabase();

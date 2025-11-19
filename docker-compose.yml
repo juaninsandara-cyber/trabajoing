@@ -9,7 +9,7 @@ services:
       MYSQL_USER: app_user
       MYSQL_PASSWORD: app_pass
     ports:
-      - "3306:3306"
+      - "3307:3306"
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 10s
@@ -31,3 +31,7 @@ services:
       DB_NAME: tienda_v1
       NODE_ENV: production
       PORT: 3000
+
+
+      MERCADOPAGO_ACCESS_TOKEN: TEST-1234567890123456-123456-1234567890abc
+      MERCADOPAGO_PUBLIC_KEY: TEST-12345678-1234-1234-1234-123456789012

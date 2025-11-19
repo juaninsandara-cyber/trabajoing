@@ -43,10 +43,6 @@ const { sequelize } = require('./models');
 
 
 
-// Importar modelos de Sequelize
-require('./models/user');
-require('./models/ingreso');
-require('./models/membresia');
 
 // Configuración de variables de entorno
 dotenv.config();
@@ -201,7 +197,7 @@ function verificarLimiteGasto(req, res, next) {
     const ahora = Date.now();
     if (ahora - securityStorage.userSpending[ip].ultimaAlerta > ALERT_INTERVAL) {
       securityStorage.userSpending[ip].ultimaAlerta = ahora;
-      console.warn(`⚠️ IP ${ip} superó el límite de gasto de $${MAX_AMOUNT}`);
+      console.warn(`IP ${ip} superó el límite de gasto de $${MAX_AMOUNT}`);
     }
     return res.status(429).json({ error: `Límite de gasto superado ($${MAX_AMOUNT}).` });
   }

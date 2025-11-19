@@ -1,204 +1,128 @@
 const { Membresia, User } = require('../models');
 const { Op } = require('sequelize');
 
-// ======================================================
-//  CREAR MEMBRESÍA
-// ======================================================
 exports.crearMembresia = async (req, res) => {
   try {
+    console.log('🎯 INICIANDO crearMembresia');
+    console.log('📦 Body:', req.body);
+    
     const { username, password, tipo, duracion } = req.body;
 
-    // Validaciones iniciales
+    // Validaciones básicas
     if (!username || !password || !tipo || !duracion) {
-      return res.status(400).json({ message: 'Faltan campos obligatorios' });
+      return res.status(400).json({ message: 'Faltan campos' });
     }
 
-    if (duracion <= 0) {
-      return res.status(400).json({ message: 'La duración debe ser mayor a 0' });
-    }
-
+    console.log('🔍 Buscando usuario:', username);
+    
     // Buscar usuario
     const user = await User.findOne({ where: { username } });
+    console.log('👤 Usuario encontrado:', user ? 'SÍ' : 'NO');
+    
     if (!user) {
-      return res.status(401).json({ message: 'Credenciales incorrectas' });
+      return res.status(401).json({ message: 'Usuario no existe' });
     }
 
-    // Validar contraseña segura
-    const passwordValido = await user.validarPassword(password);
-    if (!passwordValido) {
-      return res.status(401).json({ message: 'Credenciales incorrectas' });
-    }
+    console.log('🆔 User ID:', user.id);
 
-    // Verificar estado del usuario
-    if (user.estado !== 'activo') {
-      return res.status(403).json({ message: 'Usuario no activo' });
-    }
-
-    // Calcular fechas
-    const fechaInicio = new Date();
-    const fechaFin = new Date(fechaInicio);
-
-    if (tipo === 'semanal') {
-      fechaFin.setDate(fechaFin.getDate() + duracion * 7);
-    } else if (tipo === 'mensual') {
-      // Cálculo más preciso para meses
-      const diasMensuales = duracion * 30;
-      fechaFin.setDate(fechaFin.getDate() + diasMensuales);
-    } else {
-      return res.status(400).json({ message: 'Tipo de membresía inválido' });
-    }
-
-    // Crear membresía
-    const membresia = await Membresia.create({
+    // CREAR MEMBRESÍA SIMPLIFICADA
+    console.log('📝 Creando membresía...');
+    const membresiaData = {
       userId: user.id,
-      tipo,
-      fechaInicio,
-      fechaFin,
-      precio: tipo === 'semanal' ? 50.0 : 150.0,
-    });
+      tipo: tipo,
+      duracion: duracion
+    };
+    
+    console.log('📊 Datos membresía:', membresiaData);
+    
+    const membresia = await Membresia.create(membresiaData);
+    console.log('✅ Membresía creada ID:', membresia.id);
 
+    // Respuesta exitosa
     res.status(201).json({
       message: `Membresía ${tipo} creada exitosamente`,
       membresia: {
         id: membresia.id,
         tipo: membresia.tipo,
-        fechaInicio: membresia.fechaInicio,
-        fechaFin: membresia.fechaFin,
-        precio: membresia.precio,
-      },
+        duracion: membresia.duracion,
+        userId: membresia.userId
+      }
     });
+
   } catch (error) {
-    console.error('Error crear membresía:', error);
-    res.status(500).json({ message: 'Error interno del servidor' });
+    console.error('🚨🚨🚨 ERROR CRÍTICO:');
+    console.error('💥 Mensaje:', error.message);
+    console.error('📋 Stack:', error.stack);
+    console.error('🔧 Nombre:', error.name);
+    console.error('❌ Detalles completos:', error);
+    
+    res.status(500).json({ 
+      message: 'Error interno - ver logs',
+      error: error.message
+    });
   }
 };
 
-// ======================================================
-// 📗 VERIFICAR MEMBRESÍA
-// ======================================================
+// Las otras funciones las dejamos simples por ahora
 exports.verificarMembresia = async (req, res) => {
   try {
+    console.log('🎯 INICIANDO verificarMembresia');
+    console.log('📦 Body:', req.body);
+    
     const { username, password } = req.body;
 
     if (!username || !password) {
       return res.status(400).json({ message: 'Faltan credenciales' });
     }
 
-    // Verificar usuario
+    console.log('🔍 Buscando usuario:', username);
     const user = await User.findOne({ where: { username } });
+    console.log('👤 Usuario encontrado:', user ? 'SÍ' : 'NO');
+    
     if (!user) {
       return res.status(401).json({ message: 'Credenciales incorrectas' });
     }
 
-    const passwordValido = await user.validarPassword(password);
-    if (!passwordValido) {
-      return res.status(401).json({ message: 'Credenciales incorrectas' });
-    }
+    console.log('🆔 User ID:', user.id);
 
-    if (user.estado !== 'activo') {
-      return res.status(403).json({ message: 'Usuario no activo' });
-    }
-
-    // Buscar membresía activa
-    const membresiaActiva = await Membresia.findOne({
+    // Buscar membresías activas
+    console.log('🔍 Buscando membresías activas...');
+    const membresias = await Membresia.findAll({
       where: {
-        userId: user.id,
-        fechaFin: { [Op.gt]: new Date() },
-      },
-      order: [['fechaFin', 'DESC']],
+        userId: user.id
+      }
     });
 
-    if (!membresiaActiva) {
+    console.log('📊 Membresías encontradas:', membresias.length);
+
+    if (membresias.length === 0) {
       return res.status(404).json({
-        message: 'No tienes una membresía activa',
+        message: 'No tienes membresías',
         tieneMembresia: false,
+        membresias: []
       });
     }
 
     res.status(200).json({
-      message: 'Membresía activa encontrada',
+      message: 'Membresías encontradas',
       tieneMembresia: true,
-      membresia: {
-        id: membresiaActiva.id,
-        tipo: membresiaActiva.tipo,
-        fechaInicio: membresiaActiva.fechaInicio,
-        fechaFin: membresiaActiva.fechaFin,
-        precio: membresiaActiva.precio,
-      },
+      total: membresias.length,
+      membresias: membresias.map(m => ({
+        id: m.id,
+        tipo: m.tipo,
+        duracion: m.duracion,
+        userId: m.userId
+      }))
     });
+
   } catch (error) {
-    console.error('Error verificar membresía:', error);
-    res.status(500).json({ message: 'Error interno del servidor' });
+    console.error('🚨 ERROR verificar membresía:', error.message);
+    res.status(500).json({ 
+      message: 'Error interno',
+      error: error.message
+    });
   }
 };
-
-// ======================================================
-//  RENOVAR MEMBRESÍA
-// ======================================================
 exports.renovarMembresia = async (req, res) => {
-  try {
-    const { username, password, tipo, duracion } = req.body;
-
-    if (!username || !password || !tipo || !duracion) {
-      return res.status(400).json({ message: 'Faltan campos obligatorios' });
-    }
-
-    const user = await User.findOne({ where: { username } });
-    if (!user) {
-      return res.status(401).json({ message: 'Credenciales incorrectas' });
-    }
-
-    const passwordValido = await user.validarPassword(password);
-    if (!passwordValido) {
-      return res.status(401).json({ message: 'Credenciales incorrectas' });
-    }
-
-    if (user.estado !== 'activo') {
-      return res.status(403).json({ message: 'Usuario no activo' });
-    }
-
-    // Buscar membresía más reciente
-    const membresiaActual = await Membresia.findOne({
-      where: { userId: user.id },
-      order: [['fechaFin', 'DESC']],
-    });
-
-    let fechaInicio = new Date();
-    if (membresiaActual && new Date(membresiaActual.fechaFin) > new Date()) {
-      fechaInicio = new Date(membresiaActual.fechaFin);
-    }
-
-    const fechaFin = new Date(fechaInicio);
-
-    if (tipo === 'semanal') {
-      fechaFin.setDate(fechaFin.getDate() + duracion * 7);
-    } else if (tipo === 'mensual') {
-      const diasMensuales = duracion * 30;
-      fechaFin.setDate(fechaFin.getDate() + diasMensuales);
-    } else {
-      return res.status(400).json({ message: 'Tipo de membresía inválido' });
-    }
-
-    const nuevaMembresia = await Membresia.create({
-      userId: user.id,
-      tipo,
-      fechaInicio,
-      fechaFin,
-      precio: tipo === 'semanal' ? 50.0 : 150.0,
-    });
-
-    res.status(201).json({
-      message: 'Membresía renovada exitosamente',
-      membresia: {
-        id: nuevaMembresia.id,
-        tipo: nuevaMembresia.tipo,
-        fechaInicio: nuevaMembresia.fechaInicio,
-        fechaFin: nuevaMembresia.fechaFin,
-        precio: nuevaMembresia.precio,
-      },
-    });
-  } catch (error) {
-    console.error('Error renovar membresía:', error);
-    res.status(500).json({ message: 'Error interno del servidor' });
-  }
+  res.status(200).json({ message: 'Función en desarrollo' });
 };

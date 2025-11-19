@@ -33,7 +33,20 @@ const validarDatosIngreso = (datos) => {
 // Registrar ingreso
 exports.registrarIngreso = async (req, res) => {
   try {
+    //  AGREGAR ESTE LOGGING COMPLETO
+    console.log('INICIANDO registrarIngreso');
+    console.log('BODY COMPLETO:', JSON.stringify(req.body, null, 2));
+    console.log(' CAMPOS:', Object.keys(req.body));
+    console.log('Username:', req.body.username);
+    console.log(' Password:', req.body.password ? 'PRESENTE' : 'FALTANTE');
+    console.log(' Placa:', req.body.placa);
+    console.log('TipoVehiculo:', req.body.tipoVehiculo);
+    console.log('TipoAcceso:', req.body.tipoAcceso);
+
     const { username, password, placa, tipoVehiculo, tipoAcceso } = req.body;
+
+    console.log(' Desestructurado - username:', username);
+    console.log(' Desestructurado - placa:', placa);
 
     console.log('Intentando registrar ingreso:', { username, placa });
 
