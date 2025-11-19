@@ -83,7 +83,7 @@ async getEstadoParqueadero(req, res) {
                                 <h2 style="color: #007bff;"> Prueba de Notificación</h2>
                                 <p>Hola <strong>${nombre}</strong>,</p>
                                 <p>Esta es una <strong>prueba del sistema de notificaciones</strong> del parqueadero.</p>
-                                <p>Cuando el parqueadero esté por llenarse (80%+ de ocupación), recibirás una alerta automática.</p>
+                                <p> el parqueadero esté por llenarse no olvide guardar tu puesto.</p>
                                 <p><strong>Tu membresía:</strong> ${membresiaItem.tipo}</p>
                                 <br>
                                 <p style="color: #28a745; font-weight: bold;">Si recibes este correo, el sistema está funcionando correctamente.</p>

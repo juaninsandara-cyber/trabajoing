@@ -45,18 +45,26 @@ exports.login = async (req, res) => {
   try {
     const { username, password } = req.body;
 
-    console.log('🔍 Buscando usuario para login:', username);
+    console.log('Buscando usuario para login:', username);
     
-    // Buscar usuario con username Y password 
+    // 1. Buscar SOLO por username (NO incluir password en la búsqueda)
     const user = await User.findOne({ 
       where: { 
-        username: username,
-        password: password  
+        username: username
       } 
     });
     
     if (!user) {
-      console.log('Usuario no encontrado o contraseña incorrecta');
+      console.log('Usuario no encontrado');
+      return res.status(401).json({ message: 'Credenciales inválidas' });
+    }
+
+    // 2. Verificar contraseña usando el método validPassword
+    console.log(' Verificando contraseña...');
+    const isPasswordValid = await user.validPassword(password);
+    
+    if (!isPasswordValid) {
+      console.log('Contraseña incorrecta');
       return res.status(401).json({ message: 'Credenciales inválidas' });
     }
 

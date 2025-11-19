@@ -5,9 +5,15 @@ exports.crearMembresia = async (req, res) => {
   try {
     const { username, password, tipo, duracion } = req.body;
 
-    // Verificar usuario -
-    const user = await User.findOne({ where: { username, password } }); // ← Buscar directo
+    
+    const user = await User.findOne({ where: { username } });
     if (!user) {
+      return res.status(401).json({ message: 'Usuario no encontrado' });
+    }
+
+    
+    const isPasswordValid = await user.validPassword(password);
+    if (!isPasswordValid) {
       return res.status(401).json({ message: 'Credenciales incorrectas' });
     }
 
@@ -53,9 +59,14 @@ exports.verificarMembresia = async (req, res) => {
   try {
     const { username, password } = req.body;
 
-    // Verificar usuario - SIN validarPassword
-    const user = await User.findOne({ where: { username, password } });
+    
+    const user = await User.findOne({ where: { username } });
     if (!user) {
+      return res.status(401).json({ message: 'Usuario no encontrado' });
+    }
+
+    const isPasswordValid = await user.validPassword(password);
+    if (!isPasswordValid) {
       return res.status(401).json({ message: 'Credenciales incorrectas' });
     }
 
@@ -95,9 +106,14 @@ exports.renovarMembresia = async (req, res) => {
   try {
     const { username, password, tipo, duracion } = req.body;
 
-    // Verificar usuario - SIN validarPassword
-    const user = await User.findOne({ where: { username, password } });
+    //verificacion
+    const user = await User.findOne({ where: { username } });
     if (!user) {
+      return res.status(401).json({ message: 'Usuario no encontrado' });
+    }
+
+    const isPasswordValid = await user.validPassword(password);
+    if (!isPasswordValid) {
       return res.status(401).json({ message: 'Credenciales incorrectas' });
     }
 
