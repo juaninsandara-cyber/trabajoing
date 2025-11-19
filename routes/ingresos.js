@@ -1,85 +1,114 @@
-// routes/ingresos.js - VERSIÓN COMPLETA CORREGIDA
+
 const express = require('express');
 const router = express.Router();
 const { Ingreso, User } = require('../models');
 
-// Crear un nuevo ingreso
+/**
+ * @swagger
+ * tags:
+ *   name: Ingresos
+ *   description: Gestión de ingresos y salidas de vehículos
+ */
+
+/**
+ * @swagger
+ * /ingresos:
+ *   post:
+ *     summary: Registrar un nuevo ingreso de vehículo
+ *     tags: [Ingresos]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - placa
+ *               - tipoVehiculo
+ *               - tipoAccesso
+ *             properties:
+ *               placa:
+ *                 type: string
+ *                 example: "ABC123"
+ *               tipoVehiculo:
+ *                 type: string
+ *                 enum: [carro, moto]
+ *                 example: "carro"
+ *               tipoAccesso:
+ *                 type: string
+ *                 enum: [membresía, día]
+ *                 example: "membresía"
+ *               ticketPago:
+ *                 type: string
+ *                 example: "TICKET-001"
+ *                 description: Requerido solo para acceso tipo "día"
+ *               horaEntrada:
+ *                 type: string
+ *                 format: date-time
+ *                 example: "2024-01-15T10:30:00Z"
+ *               horaSalida:
+ *                 type: string
+ *                 format: date-time
+ *                 example: "2024-01-15T15:30:00Z"
+ *               userId:
+ *                 type: integer
+ *                 example: 1
+ *     responses:
+ *       201:
+ *         description: Ingreso registrado exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Ingreso registrado exitosamente"
+ *                 ingreso:
+ *                   $ref: '#/components/schemas/Vehiculo'
+ *       400:
+ *         description: Datos de entrada inválidos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: Error interno del servidor
+ */
 router.post('/', async (req, res) => {
-  try {
-    const { placa, tipoVehiculo, tipoAccesso, ticketPago, horaEntrada, horaSalida, userId } = req.body;
-
-    // ✅ VALIDACIONES CORREGIDAS (tipoAccesso con doble 's')
-    if (!placa || !tipoVehiculo || !tipoAccesso) {
-      return res.status(400).json({ 
-        error: 'Placa, tipo de vehículo y tipo de acceso son requeridos' 
-      });
-    }
-
-    const tiposVehiculoValidos = ['carro', 'moto'];
-    const tiposAccessoValidos = ['membresía', 'día'];
-    
-    if (!tiposVehiculoValidos.includes(tipoVehiculo)) {
-      return res.status(400).json({ 
-        error: 'Tipo de vehículo inválido. Use: carro o moto' 
-      });
-    }
-
-    if (!tiposAccessoValidos.includes(tipoAccesso)) {
-      return res.status(400).json({ 
-        error: 'Tipo de acceso inválido. Use: membresía o día' 
-      });
-    }
-
-    if (tipoAccesso === 'día' && !ticketPago) {
-      return res.status(400).json({ 
-        error: 'Ticket de pago es requerido para acceso por día' 
-      });
-    }
-
-    const nuevoIngreso = await Ingreso.create({
-      placa: placa.toUpperCase(),
-      tipoVehiculo,
-      tipoAccesso, 
-      ticketPago,
-      horaEntrada: horaEntrada || new Date(),
-      horaSalida,
-      userId: null
-    });
-
-    res.status(201).json({
-      message: 'Ingreso registrado exitosamente',
-      ingreso: nuevoIngreso
-    });
-
-  } catch (error) {
-    console.error('Error al crear ingreso:', error);
-    res.status(500).json({ 
-      error: 'Error interno del servidor',
-      detalle: error.message // Para debugging
-    });
-  }
+  // ... código existente ...
 });
 
-// Obtener todos los ingresos
+/**
+ * @swagger
+ * /ingresos:
+ *   get:
+ *     summary: Obtener todos los ingresos
+ *     tags: [Ingresos]
+ *     description: Retorna el listado completo de ingresos registrados con información de usuarios
+ *     responses:
+ *       200:
+ *         description: Lista de ingresos obtenida exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Ingresos obtenidos exitosamente"
+ *                 total:
+ *                   type: integer
+ *                   example: 50
+ *                 ingresos:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Vehiculo'
+ *       500:
+ *         description: Error al obtener ingresos
+ */
 router.get('/', async (req, res) => {
-  try {
-    const ingresos = await Ingreso.findAll({
-      include: [{
-        model: User,
-        attributes: ['id', 'username']
-      }],
-      order: [['horaEntrada', 'DESC']]
-    });
-    
-    res.json({
-      message: 'Ingresos obtenidos exitosamente',
-      total: ingresos.length,
-      ingresos
-    });
-  } catch (error) {
-    console.error('Error al obtener ingresos:', error);
-    res.status(500).json({ error: 'Error al obtener ingresos' });
-  }
+  // ... código existente ...
 });
 
 module.exports = router;

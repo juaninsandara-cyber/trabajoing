@@ -1,4 +1,4 @@
-// controllers/notificacionController.js - VERSIÓN CORREGIDA
+// controllers/notificacionController.js 
 const nodemailer = require('nodemailer');
 const Ingreso = require('../models/ingreso');
 const User = require('../models/user');

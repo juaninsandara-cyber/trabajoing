@@ -68,12 +68,12 @@ const options = {
             horaEntrada: {
               type: "string",
               format: "date-time",
-              example: "2024-01-15T10:30:00Z"
+              example: "2025-01-15T10:30:00Z"
             },
             horaSalida: {
               type: "string",
               format: "date-time",
-              example: "2024-01-15T15:30:00Z"
+              example: "2025-01-15T15:30:00Z"
             },
             ticketPago: {
               type: "string",
@@ -97,12 +97,12 @@ const options = {
             fechaInicio: {
               type: "string",
               format: "date",
-              example: "2024-01-01"
+              example: "2025-01-01"
             },
             fechaFin: {
               type: "string",
               format: "date",
-              example: "2024-02-01"
+              example: "2025-02-01"
             },
             precio: {
               type: "number",

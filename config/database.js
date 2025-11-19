@@ -1,29 +1,17 @@
-// config/database.js
-'use strict';
-const { Sequelize } = require('sequelize');
 require('dotenv').config();
+const { Sequelize } = require('sequelize');
 
 const sequelize = new Sequelize(
-  process.env.DB_NAME, // nombre de la BD
-  process.env.DB_USER, // usuario
-  process.env.DB_PASS, // contraseña
+  process.env.DB_NAME,
+  process.env.DB_USER,
+  process.env.DB_PASS,
   {
     host: process.env.DB_HOST,
-    port: process.env.DB_PORT || 3306,
+    port: process.env.DB_PORT,
     dialect: 'mysql',
-    logging: false,
+    logging: false, // quita logs de SQL en consola
   }
-
 );
 
-// Prueba de conexión
-(async () => {
-  try {
-    await sequelize.authenticate();
-    console.log(' Conectado correctamente a la base de datos MySQL');
-  } catch (error) {
-    console.error('Error al conectar con la base de datos:', error);
-  }
-})();
-
 module.exports = sequelize;
+

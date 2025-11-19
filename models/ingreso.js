@@ -1,24 +1,38 @@
-// models/ingreso.js
 const { DataTypes } = require('sequelize');
-const { sequelize } = require('./index'); // usa la instancia global de conexión
+const sequelize = require('../config/database');
+const User = require('./user');
 
 const Ingreso = sequelize.define('Ingreso', {
-  descripcion: {
+  placa: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: false
   },
-  monto: {
-    type: DataTypes.FLOAT,
-    allowNull: false,
+  tipoVehiculo: {
+    type: DataTypes.ENUM('carro', 'moto'),
+    allowNull: false
   },
-  fecha: {
+  tipoAcceso: {
+    type: DataTypes.ENUM('membresía', 'día'),
+    allowNull: false
+  },
+  ticketPago: {
+    type: DataTypes.STRING,
+    allowNull: true // solo para accesos por día
+  },
+  horaEntrada: {
     type: DataTypes.DATE,
     allowNull: false,
-    defaultValue: DataTypes.NOW,
+    defaultValue: DataTypes.NOW
   },
+  horaSalida: {
+    type: DataTypes.DATE,
+    allowNull: true
+  }
 }, {
-  tableName: 'ingresos',
-  timestamps: false,
+  timestamps: true
 });
+
+User.hasMany(Ingreso, { foreignKey: 'userId' });
+Ingreso.belongsTo(User, { foreignKey: 'userId' });
 
 module.exports = Ingreso;

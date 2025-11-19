@@ -1,116 +1,118 @@
 const Ingreso = require('../models/ingreso');
 const User = require('../models/user');
 const { Op } = require('sequelize');
-const bcrypt = require('bcryptjs'); // para validar contraseñas encriptadas
 
-//  Validar datos de entrada
+// Validar datos de entrada
 const validarDatosIngreso = (datos) => {
   const errores = [];
 
   if (!datos.username || datos.username.length < 3) {
-    errores.push('El nombre de usuario debe tener al menos 3 caracteres.');
+    errores.push('Username debe tener al menos 3 caracteres');
   }
 
   if (!datos.password) {
-    errores.push('La contraseña es obligatoria.');
+    errores.push('Password es requerido');
   }
 
   if (!datos.placa || !/^[A-Z0-9]{3,10}$/i.test(datos.placa)) {
-    errores.push('La placa debe tener entre 3 y 10 caracteres alfanuméricos.');
+    errores.push('Placa debe tener entre 3 y 10 caracteres alfanuméricos');
   }
 
-  if (!['carro', 'moto'].includes(datos.tipoVehiculo?.toLowerCase())) {
-    errores.push('El tipo de vehículo debe ser "carro" o "moto".');
+  if (!['carro', 'moto'].includes(datos.tipoVehiculo)) {
+    errores.push('Tipo de vehículo debe ser: carro o moto');
   }
 
-  if (!['membresia', 'día', 'dia'].includes(datos.tipoAcceso?.toLowerCase())) {
-    errores.push('El tipo de acceso debe ser "membresía" o "día".');
+  if (!['membresía', 'día'].includes(datos.tipoAcceso)) {
+    errores.push('Tipo de acceso debe ser: membresía o día');
   }
 
   return errores;
 };
 
-// Registrar ingreso
+// Registrar ingreso 
 exports.registrarIngreso = async (req, res) => {
   try {
     const { username, password, placa, tipoVehiculo, tipoAcceso } = req.body;
 
-    console.log('Intentando registrar ingreso:', { username, placa });
+    console.log('Intentando registro de ingreso:', { username, placa });
 
-    //  Validación de campos
-    const errores = validarDatosIngreso(req.body);
-    if (errores.length > 0) {
-      return res.status(400).json({ message: 'Datos inválidos', errores });
+    // Validar datos
+    const erroresValidacion = validarDatosIngreso(req.body);
+    if (erroresValidacion.length > 0) {
+      return res.status(400).json({
+        message: 'Datos inválidos',
+        errores: erroresValidacion
+      });
     }
 
-    // Buscar usuario por nombre
-    const user = await User.findOne({ where: { username } });
+    // Verificar credenciales
+    const user = await User.findOne({ where: { username, password } });
     if (!user) {
-      return res.status(401).json({ message: 'Usuario no encontrado' });
+      return res.status(401).json({ 
+        message: 'Credenciales incorrectas',
+        error: 'USER_NOT_FOUND'
+      });
     }
 
-    // Verificar contraseña con bcrypt
-    const passwordValido = await bcrypt.compare(password, user.password);
-    if (!passwordValido) {
-      return res.status(401).json({ message: 'Contraseña incorrecta' });
-    }
-
-    //  Verificar si el vehículo ya está adentro
+    // Verificar si el vehículo ya está dentro
     const ingresoActivo = await Ingreso.findOne({
-      where: { placa: placa.toUpperCase(), horaSalida: null }
+      where: {
+        placa: placa.toUpperCase(),
+        horaSalida: null
+      }
     });
 
     if (ingresoActivo) {
       return res.status(400).json({
-        message: 'Este vehículo ya se encuentra dentro del parqueadero',
-        error: 'VEHICLE_ALREADY_INSIDE'
+        message: 'Este vehículo ya se encuentra en el parqueadero',
+        error: 'VEHICLE_ALREADY_INSIDE',
+        ingreso: ingresoActivo
       });
     }
 
-    //  Normalizar datos
-    const tipoAccesoNorm = tipoAcceso.toLowerCase().replace('í', 'i');
-    const tipoVehiculoNorm = tipoVehiculo.toLowerCase();
-    const placaNorm = placa.toUpperCase();
+    // Normalizar datos
+    const tipoAccesoNormalizado = tipoAcceso.toLowerCase().replace('í', 'i');
+    const tipoVehiculoNormalizado = tipoVehiculo.toLowerCase();
+    const placaNormalizada = placa.toUpperCase();
 
-    // Contar vehículos actuales por tipo
+    // Contar vehículos actuales
     const conteoActual = await Ingreso.count({
       where: {
         horaSalida: null,
-        tipoVehiculo: tipoVehiculoNorm,
-        tipoAcceso: tipoAccesoNorm
+        tipoVehiculo: tipoVehiculoNormalizado,
+        tipoAcceso: tipoAccesoNormalizado
       }
     });
 
-    //  Definir límites
-    const limites = {
-      membresia: { carro: 20, moto: 50 },
-      dia: { carro: 40, moto: 100 }
-    };
-    const limite = limites[tipoAccesoNorm]?.[tipoVehiculoNorm];
+    // Validar cupos
+    const limites = { membresia: { carro: 20, moto: 50 }, dia: { carro: 40, moto: 100 } };
+    const limite = limites[tipoAccesoNormalizado]?.[tipoVehiculoNormalizado];
 
     if (!limite) {
-      return res.status(400).json({ message: 'Tipo de acceso o vehículo inválido' });
+      return res.status(400).json({
+        message: 'Tipo de acceso o vehículo inválido'
+      });
     }
 
     if (conteoActual >= limite) {
       return res.status(400).json({
-        message: `No hay cupos disponibles para ${tipoVehiculoNorm}s de ${tipoAccesoNorm}`,
+        message: `No hay cupos disponibles para ${tipoVehiculoNormalizado}s de ${tipoAccesoNormalizado}`,
         cuposDisponibles: 0
       });
     }
 
-    //  Generar ticket de pago (si aplica)
+    // Generar ticket de pago si es acceso diario
     let ticketPago = null;
-    if (tipoAccesoNorm === 'dia') {
-      ticketPago = `FACTURA-${placaNorm}-${Date.now()}`;
+    if (tipoAccesoNormalizado === 'dia') {
+      ticketPago = `FACTURA-${placaNormalizada}-${Date.now()}`;
     }
 
     // Registrar ingreso
     const nuevoIngreso = await Ingreso.create({
       userId: user.id,
-      placa: placaNorm,
-      tipoVehiculo: tipoVehiculoNorm,
-      tipoAcceso: tipoAccesoNorm,
+      placa: placaNormalizada,
+      tipoVehiculo: tipoVehiculoNormalizado,
+      tipoAcceso: tipoAccesoNormalizado,
       ticketPago,
       horaEntrada: new Date()
     });
@@ -119,9 +121,9 @@ exports.registrarIngreso = async (req, res) => {
       message: 'Ingreso registrado con éxito',
       factura: ticketPago ? {
         numero: ticketPago,
-        placa: placaNorm,
-        tipoVehiculo: tipoVehiculoNorm,
-        tipoAcceso: tipoAccesoNorm,
+        placa: placaNormalizada,
+        tipoVehiculo: tipoVehiculoNormalizado,
+        tipoAcceso: tipoAccesoNormalizado,
         horaEntrada: nuevoIngreso.horaEntrada
       } : null,
       cuposDisponibles: limite - conteoActual - 1,
@@ -130,7 +132,10 @@ exports.registrarIngreso = async (req, res) => {
 
   } catch (error) {
     console.error('Error al registrar ingreso:', error);
-    res.status(500).json({ message: 'Error interno del servidor', error: error.message });
+    res.status(500).json({ 
+      message: 'Error interno del servidor',
+      error: error.message 
+    });
   }
 };
 
@@ -139,27 +144,28 @@ exports.registrarSalida = async (req, res) => {
   try {
     const { username, password, placa } = req.body;
 
-    console.log(' Intentando registrar salida:', { username, placa });
+    console.log('Intentando registrar salida:', { username, placa });
 
-    //  Buscar usuario
-    const user = await User.findOne({ where: { username } });
+    // Verificar usuario
+    const user = await User.findOne({ where: { username, password } });
     if (!user) {
-      return res.status(401).json({ message: 'Usuario no encontrado' });
-    }
-
-    //  Validar contraseña
-    const passwordValido = await bcrypt.compare(password, user.password);
-    if (!passwordValido) {
-      return res.status(401).json({ message: 'Contraseña incorrecta' });
+      return res.status(401).json({ message: 'Credenciales incorrectas' });
     }
 
     // Buscar ingreso activo
     const ingreso = await Ingreso.findOne({
-      where: { userId: user.id, placa: placa.toUpperCase(), horaSalida: null }
+      where: {
+        userId: user.id,
+        placa: placa.toUpperCase(),
+        horaSalida: null
+      }
     });
 
     if (!ingreso) {
-      return res.status(404).json({ message: 'No hay ingreso activo para esta placa' });
+      return res.status(404).json({ 
+        message: 'No hay ingreso activo para esta placa',
+        error: 'NO_ACTIVE_ENTRY'
+      });
     }
 
     // Registrar salida
@@ -179,6 +185,9 @@ exports.registrarSalida = async (req, res) => {
 
   } catch (error) {
     console.error(' Error al registrar salida:', error);
-    res.status(500).json({ message: 'Error interno del servidor', error: error.message });
+    res.status(500).json({ 
+      message: 'Error interno del servidor',
+      error: error.message 
+    });
   }
 };
