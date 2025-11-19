@@ -18,10 +18,26 @@ const User = sequelize.define('User', {
     allowNull: true
   },
   role: {
-    type: DataTypes.STRING,
-    allowNull: true,
-    defaultValue: 'user'
-  }
+
+    type: DataTypes.ENUM('admin', 'user', 'empleado'),
+    defaultValue: 'user',
+    validate: {
+      isIn: {
+        args: [['admin', 'user', 'empleado']],
+        msg: 'Rol no válido'
+      }
+    }
+  },
+  estado: {
+    type: DataTypes.ENUM('activo', 'inactivo', 'suspendido'),
+    defaultValue: 'activo',
+    validate: {
+      isIn: {
+        args: [['activo', 'inactivo', 'suspendido']],
+        msg: 'Estado no válido'
+      }
+    }
+  },
 }, {
   tableName: 'users',
   timestamps: false,

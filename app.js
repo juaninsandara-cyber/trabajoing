@@ -15,6 +15,10 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var paymentsRouter = require('./routes/payments');
 const membresiasRouter = require('./routes/membresias');
+const { swaggerUi, swaggerSpec } = require("./config/swagger");
+
+
+
 const ingresosRouter = require('./routes/ingresos');
 const activosRouter = require('./routes/activos');
 const notificacionRoutes = require('./routes/notificaciones');
@@ -189,6 +193,8 @@ app.use('/api/ingresos', ingresosRouter);
 app.use('/api/membresias', membresiasRouter);
 app.use('/activos', activosRouter);
 app.use('/notificaciones', notificacionRoutes);
+// swagger
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // =============================================================================
 // ENDPOINTS DE SEGURIDAD Y PRUEBA
